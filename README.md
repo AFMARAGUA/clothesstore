@@ -11,7 +11,7 @@ git clone https://github.com/AFMARAGUA/clothesstore.git
 ## Getting Started
 
 ```
-flutter get packages
+flutter packages get
 ```
 ```
 flutter run
