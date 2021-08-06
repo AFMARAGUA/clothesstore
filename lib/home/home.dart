@@ -13,19 +13,49 @@ class HomeScreen extends StatelessWidget {
 
   static final String routeName = '/home';
 
+  _infoData({
+    EdgeInsetsGeometry padding,
+    @required message,
+    bool statusError = false,
+  }) {
+    return Container(
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: padding ?? Get.height * 0.25),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              height: 200.0,
+              child: SvgPicture.asset(
+                'assets/images/${statusError ? "undraw_error.svg" : "undraw_empty.svg"}',
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 20.0),
+              child: Text(
+                "$message",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final HomeController controller = Get.put(HomeController());
     return Scaffold(
       backgroundColor: Color(0xffffffff),
       body: Container(
-        margin: EdgeInsets.only(top: 15.0),
+        margin: EdgeInsets.only(top: Get.height * 0.020),
         child: CustomScrollView(
           slivers: [
             SliverAppBar(
               elevation: 0.0,
               title: Container(
-                margin: EdgeInsets.only(left: 10.0),
+                margin: EdgeInsets.only(left: Get.height * 0.035),
                 height: 200.0,
                 width: 200.0,
                 child: SvgPicture.asset(
@@ -34,7 +64,7 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               leading: Container(
-                margin: EdgeInsets.only(left: 20.0),
+                margin: EdgeInsets.only(left: Get.height * 0.020),
                 height: 10.0,
                 width: 10.0,
                 child: SvgPicture.asset(
@@ -44,7 +74,7 @@ class HomeScreen extends StatelessWidget {
               ),
               actions: [
                 Container(
-                  margin: EdgeInsets.only(right: 20.0),
+                  margin: EdgeInsets.only(right: Get.height * 0.020),
                   height: 30.0,
                   width: 30.0,
                   child: SvgPicture.asset(
@@ -57,21 +87,33 @@ class HomeScreen extends StatelessWidget {
               backgroundColor: Color(0xffffffff),
               bottom: PreferredSize(
                 preferredSize: Size.fromHeight(Get.height * 0.050),
-                child: Container(
-                  margin: EdgeInsets.all(10.0),
+                child: Padding(
+                  padding: EdgeInsets.all(10),
                   child: Search.textFormField(
                     textInputAction: TextInputAction.search,
+                    controller: controller.controllerSearch,
                     decoration: InputDecoration(
                       fillColor: Color(0xffeeeeee),
                       filled: true,
-                      hintText: 'Buscar aquí producto',
+                      hoverColor: Colors.black,
+                      enabledBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                      ),
+                      focusedBorder: UnderlineInputBorder(
+                        borderSide: BorderSide(color: Colors.transparent),
+                      ),
+                      hintText: 'Busca el producto aquí...',
                       suffixIcon: Container(
                         decoration: new BoxDecoration(
                           color: Color(0xff6b6b6b).withOpacity(0.5),
                         ),
-                        child: Icon(
-                          Icons.search,
-                          color: Colors.black,
+                        child: IconButton(
+                          onPressed: () => controller
+                              .searchItems(controller.controllerSearch.text),
+                          icon: Icon(
+                            Icons.search,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
@@ -88,20 +130,14 @@ class HomeScreen extends StatelessWidget {
                     delegate: SliverChildListDelegate(
                       [
                         Container(
+                          width: double.infinity,
                           child: FutureBuilder(
                             future: controller.listItemsSearch,
                             builder: (BuildContext context, snapshot) {
                               if (snapshot.hasData) {
                                 if (snapshot.data.length == 0) {
-                                  return Container(
-                                    height: Get.height * 0.3,
-                                    child: Center(
-                                      heightFactor: 3.0,
-                                      child: Text(
-                                        'Data not found...',
-                                      ),
-                                    ),
-                                  );
+                                  return _infoData(
+                                      message: 'Datos no encontrados...');
                                 }
                                 return Container(
                                   child: Column(
@@ -113,23 +149,15 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 );
                               } else if (snapshot.hasError) {
-                                return Container(
-                                  height: Get.height * 0.3,
-                                  child: Center(
-                                    heightFactor: 3.0,
-                                    child: Text(
-                                      "${snapshot.error}",
-                                    ),
-                                  ),
+                                return _infoData(
+                                  message: snapshot.error,
+                                  statusError: true,
                                 );
                               }
                               return Container(
-                                height: Get.height * 0.3,
-                                child: Center(
-                                  heightFactor: 3.0,
-                                  child: Text(
-                                    'Loading data...',
-                                  ),
+                                margin: EdgeInsets.only(top: Get.height * .150),
+                                child: Image.asset(
+                                  "assets/images/loading.gif",
                                 ),
                               );
                             },
@@ -168,12 +196,10 @@ class HomeScreen extends StatelessWidget {
                                   return Container(
                                     child: CarouselSlider(
                                       options: CarouselOptions(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                .45,
+                                        height: Get.height * .28,
                                         autoPlayCurve: Curves.fastOutSlowIn,
-                                        viewportFraction: 0.7,
                                         enlargeCenterPage: true,
+                                        viewportFraction: 0.5,
                                       ),
                                       items: snapshot.data
                                           .map((item) => CardItem(item: item))
@@ -181,23 +207,18 @@ class HomeScreen extends StatelessWidget {
                                     ),
                                   );
                                 } else if (snapshot.hasError) {
-                                  return Container(
-                                    height: Get.height * 0.3,
-                                    child: Center(
-                                      heightFactor: 3.0,
-                                      child: Text(
-                                        "${snapshot.error}",
-                                      ),
-                                    ),
+                                  return _infoData(
+                                    message: snapshot.error,
+                                    statusError: true,
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: Get.height * .05),
                                   );
                                 }
                                 return Container(
-                                  height: Get.height * 0.3,
-                                  child: Center(
-                                    heightFactor: 3.0,
-                                    child: Text(
-                                      'Loading data...',
-                                    ),
+                                  child: Image.asset(
+                                    "assets/images/loading.gif",
+                                    height: 100.0,
+                                    width: 100.0,
                                   ),
                                 );
                               },
@@ -205,7 +226,7 @@ class HomeScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                      footer()
+                      footer(),
                     ],
                   ),
                 );

@@ -24,30 +24,28 @@ class Search {
     TextEditingController controller,
     void Function() onTap,
   }) {
-    return SizedBox(
-      child: TextFormField(
-        onTap: () => onTap != null ? onTap() : null,
-        enabled: enabled,
-        controller: controller,
-        inputFormatters: inputFormatters,
-        textInputAction: textInputAction,
-        textAlign: textAlign,
-        maxLength: maxLength,
-        maxLines: maxLines,
-        focusNode: focusNode ?? null,
-        initialValue: controller == null ? initialValue : null,
-        autofocus: autofocus,
-        autovalidateMode: autovalidateMode,
-        decoration: decoration,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        readOnly: readOnly,
-        style: style,
-        onChanged: (text) => onChanged != null ? onChanged(text) : null,
-        validator: (value) => validator != null ? validator(value) : null,
-        onFieldSubmitted: (text) =>
-            onFieldSubmitted != null ? onFieldSubmitted(text) : null,
-      ),
+    return TextFormField(
+      onTap: () => onTap != null ? onTap() : null,
+      enabled: enabled,
+      controller: controller,
+      inputFormatters: inputFormatters,
+      textInputAction: textInputAction,
+      textAlign: textAlign,
+      maxLength: maxLength,
+      maxLines: maxLines,
+      focusNode: focusNode ?? null,
+      initialValue: controller == null ? initialValue : null,
+      autofocus: autofocus,
+      autovalidateMode: autovalidateMode,
+      decoration: decoration,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      readOnly: readOnly,
+      style: style,
+      onChanged: (text) => onChanged != null ? onChanged(text) : null,
+      validator: (value) => validator != null ? validator(value) : null,
+      onFieldSubmitted: (text) =>
+          onFieldSubmitted != null ? onFieldSubmitted(text) : null,
     );
   }
 }
